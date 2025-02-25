@@ -27,7 +27,8 @@ export const editRequest = async (req, res) => {
 };
 
 export const getPendingRequests = async (req, res) => {
-  const requests = await Voucher.find({ status: 'pending' });
+  const requests = await Voucher.find({ status: 'pending' })
+  .populate('userId', 'email');
   res.json(requests);
 };
 

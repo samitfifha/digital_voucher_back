@@ -52,10 +52,7 @@ export function generateVouchers(amounts) { // Export this function
 }
 
 // Function to generate XML and save to file
-export const generateVoucherXmlFile = (amounts) => {
-  // Generate vouchers
-  const vouchers = generateVouchers(amounts);
-
+export const generateVoucherXmlFile = (vouchers) => {
   // Create XML structure
   const xml = xmlbuilder.create('customerMvtListType', { version: '1.0', encoding: 'UTF-8' });
   vouchers.forEach(voucher => {

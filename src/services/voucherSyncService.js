@@ -78,6 +78,6 @@ const syncVouchers = async () => {
 };
 
 // Schedule the job to run every 10 minutes
-cron.schedule('*/60 * * * *', syncVouchers);
+cron.schedule('*/1 * * * *', syncVouchers);
 
 export default syncVouchers;

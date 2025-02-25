@@ -24,7 +24,6 @@ export const updateVoucherRequest = async (voucherId, userId, amounts, descripti
   await voucher.save();
   return voucher;
 };
-
 export const approveVoucherRequest = async (voucherId, adminEmail) => {
   // Find the voucher and populate the user's email
   const voucher = await Voucher.findById(voucherId).populate('userId', 'email');
@@ -38,14 +37,19 @@ export const approveVoucherRequest = async (voucherId, adminEmail) => {
   }
 
   voucher.status = 'approved';
-  // Generate XML file
-  const xmlFileName = generateVoucherXmlFile(voucher.amounts);
-  // Generate vouchers for Excel file
+
+  // Generate vouchers once
   const vouchers = generateVouchers(voucher.amounts);
-  // Generate Excel file (Fixed: Await the function)
+
+  // Generate XML file using the same vouchers
+  const xmlFileName = generateVoucherXmlFile(vouchers);
+
+  // Generate Excel file using the same vouchers (Fixed: Await the function)
   const excelFileName = await generateVoucherExcelFile(vouchers);
- // Generate and store voucher codes in MongoDB
- await generateAndStoreVoucherCodes(voucher._id, voucher.amounts);
+
+  // Generate and store voucher codes in MongoDB using the same vouchers
+  await generateAndStoreVoucherCodes(voucher._id, vouchers);
+
   // Save the generated file names to the voucher
   voucher.generatedFiles = {
     xmlFile: xmlFileName,
@@ -56,12 +60,12 @@ export const approveVoucherRequest = async (voucherId, adminEmail) => {
 
   // Fetch the user's email from the voucher
   const userEmail = voucher.userId.email;
+
   // Send approval emails to admin and user
   await sendApprovalEmails(adminEmail, userEmail, xmlFileName, excelFileName);
 
   return voucher;
 };
-
 
 export const rejectVoucherRequest = async (voucherId) => {
   const voucher = await Voucher.findById(voucherId);

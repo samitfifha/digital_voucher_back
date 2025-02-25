@@ -7,9 +7,7 @@ import { generateVouchers } from './xmlService.js';
  * @param {Array} amounts - The voucher amounts and their count.
  * @returns {Array} - List of created voucher codes.
  */
-export const generateAndStoreVoucherCodes = async (voucherId, amounts) => {
-  const vouchers = generateVouchers(amounts);
-
+export const generateAndStoreVoucherCodes = async (voucherId, vouchers) => {
   // Prepare bulk insert data
   const voucherCodes = vouchers.map(v => ({
     voucherId,
@@ -32,5 +30,5 @@ export const getAllVouchers = async () => {
   };
   
   export const getVouchersByVoucherId = async (voucherId) => {
-    return await VoucherCode.find({ voucherId }).select('custMvtCode amountType.value -_id');
+    return await VoucherCode.find({ voucherId });
   };

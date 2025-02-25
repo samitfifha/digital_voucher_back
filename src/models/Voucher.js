@@ -11,7 +11,8 @@ const voucherSchema = new mongoose.Schema({
   ],
   generatedFiles: {
     xmlFile: String,
-    excelFile: String
+    excelFile: String,
+    
   },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
 }, { timestamps: true },
