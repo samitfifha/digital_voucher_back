@@ -1,5 +1,6 @@
 
 // emailHelpers.js
+import path from 'path';
 import { sendEmailWithAttachments } from '../services/mailerService.js';
 
 /**
@@ -9,7 +10,7 @@ import { sendEmailWithAttachments } from '../services/mailerService.js';
  * @param {string} xmlFilePath - Path to the XML file
  * @param {string} excelFilePath - Path to the Excel file
  */
-export const sendApprovalEmails = async (adminEmail, userEmail, xmlFilePath, excelFilePath) => {
+export const sendApprovalEmails = async (adminEmail, userEmail, xmlFilePath, excelFilePath, pdfFileName) => {
     const subject = 'Voucher Approval Confirmation';
     const text = 'Your voucher request has been approved. Please find the attached files for details.';
   
@@ -22,6 +23,10 @@ export const sendApprovalEmails = async (adminEmail, userEmail, xmlFilePath, exc
       {
         filename: 'vouchers.xlsx',
         path: excelFilePath,
+      },
+      {
+        filename: pdfFileName,
+        path: path.join(process.cwd(), 'src', 'assets', pdfFileName),
       },
     ];
   

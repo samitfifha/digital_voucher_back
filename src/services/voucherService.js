@@ -5,6 +5,8 @@ import { generateVoucherExcelFile } from '../services/excelService.js'; // Impor
 import { generateVouchers } from '../services/xmlService.js'; // Import the new voucher service
 import { sendApprovalEmails } from '../helpers/emailHelpers.js'; // Import the new email helper
 import { generateAndStoreVoucherCodes } from './voucherCodeService.js'; // Import the new voucher code service
+import { generatePdf } from '../services/pdfVoucherService.js'; // Import the new PDF service
+
 export const createVoucherRequest = async (userId, amounts, description) => {
   const voucher = new Voucher({ userId, amounts, description });
   await voucher.save();
@@ -40,7 +42,6 @@ export const approveVoucherRequest = async (voucherId, adminEmail) => {
 
   // Generate vouchers once
   const vouchers = generateVouchers(voucher.amounts);
-
   // Generate XML file using the same vouchers
   const xmlFileName = generateVoucherXmlFile(vouchers);
 
@@ -50,10 +51,14 @@ export const approveVoucherRequest = async (voucherId, adminEmail) => {
   // Generate and store voucher codes in MongoDB using the same vouchers
   await generateAndStoreVoucherCodes(voucher._id, vouchers);
 
+  // Generate PDF file
+  const pdfFileName = `vouchers_${voucherId}.pdf`;
+  await generatePdf(vouchers, `src/assets/${pdfFileName}`);
   // Save the generated file names to the voucher
   voucher.generatedFiles = {
     xmlFile: xmlFileName,
     excelFile: excelFileName,
+    pdfFile: pdfFileName,
   };
 
   await voucher.save();
@@ -62,7 +67,7 @@ export const approveVoucherRequest = async (voucherId, adminEmail) => {
   const userEmail = voucher.userId.email;
 
   // Send approval emails to admin and user
-  await sendApprovalEmails(adminEmail, userEmail, xmlFileName, excelFileName);
+  await sendApprovalEmails(adminEmail, userEmail, xmlFileName, excelFileName, pdfFileName);
 
   return voucher;
 };
